@@ -1,0 +1,36 @@
+# Node modules
+node_modules/
+
+#package-lock.json
+package-lock.json
+
+# Environment
+.env
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+
+# Build files
+dist/
+build/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+
+# IDE settings
+.vscode/
+.idea/
+
+# Uploads
+uploads/
+public/images/
