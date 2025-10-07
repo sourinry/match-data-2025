@@ -43,8 +43,8 @@ const MatchSchema = new mongoose.Schema({
   },
   isActive: {
     type: Boolean,
-    default: true,
-    index: true
+    // default: true,
+    // index: true
   },
   isResult: {
     type: Boolean,
@@ -103,6 +103,11 @@ const MatchSchema = new mongoose.Schema({
   competitionId: {
     type: String,
     trim: true
+  },
+  isNew: {
+  type: Boolean,
+  default: false,
+  index: true
   }
 }, {
   timestamps: true
