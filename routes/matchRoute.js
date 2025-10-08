@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { getAllMatches, 
+const { 
+    getAllMatches, 
     getMatch, 
     updateMatchScoreIdAndType, 
     updateisActiveFiled, 
@@ -8,7 +9,7 @@ const { getAllMatches,
     deleteAll,
     updateScoreTypeForNewMatches,
     updateAllScoreType,
-    getAllScoreTypeBySportID
+    getAllSettings
  } = require('../controller/matchController');
 
 //get api for postman porpuse
@@ -23,10 +24,10 @@ router.delete('/delete', deleteAll)
 router.post('/allActiveMatches', getAllActiveMatches);
 //routes for update scoretype base on sportid 
 router.post('/updateScoreTypeForNewMatches', updateScoreTypeForNewMatches);
-//route for update All scoreType
+//route for update All scoreType [testing]
 router.post('/updateAllScoreType', updateAllScoreType);
 //route for get all scoreType
-router.post('/scoreTypes', getAllScoreTypeBySportID);
+router.post('/scoreTypes', getAllSettings);
 
 
 //get all matches
@@ -35,14 +36,6 @@ router.post('/', getAllMatches);
 router.post('/:id', updateMatchScoreIdAndType);
 //filter isActive
 router.post('/updateActiveMatches/:id', updateisActiveFiled);
-
-
-
-//route for update bulk update of present data
-
-
-
-
 
 
 

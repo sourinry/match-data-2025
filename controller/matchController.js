@@ -1,5 +1,6 @@
 const { default: mongoose } = require('mongoose');
 const Match = require('../models/match');
+const Setting = require('../models/setting');
 
 // Get matches for a specific sport
 const getAllMatches = async (req, res) => {
@@ -136,51 +137,46 @@ const deleteAll = async(req,res)=>{
 
 //new api for update scoretype for specific sportId
 const updateScoreTypeForNewMatches = async (req, res) => {
+  const { sportId, scoreType } = req.body;
+
+  if (!sportId || !scoreType) {
+    return res.status(400).json({
+      success: false,
+      message: "sportId & scoreType are required",
+    });
+  }
+
   try {
-    const { sportId, scoreType } = req.body;
+    const settingResult = await Setting.updateOne(
+      { sportId },
+      { $set: { scoreType } },
+      { upsert: true }
+    );
 
-    if (!sportId || !scoreType) {
-      return res.status(400).json({
-        success: false,
-        message: "sportId & scoreType are required",
-      });
-    }
-
-    // Update only newly inserted matches (isNew: true)
     const result = await Match.updateMany(
       { sportId, isNew: true },
       { $set: { scoreType, isNew: false } }
     );
 
-    // No new matches found
-    if (result.modifiedCount === 0) {
+    if (result.modifiedCount == 0) {
       return res.json({
         success: true,
         message: "No new matches found to update",
-        updatedCount: 0,
-        updatedAt: null
       });
     }
 
-    // Return updatedAt for frontend (current timestamp)
-    const updatedAt = new Date().toISOString();
-
-    return res.json({
+    res.json({
       success: true,
       message: `ScoreType updated for ${result.modifiedCount} new matches`,
       updatedCount: result.modifiedCount,
-      updatedAt, //frontend can show this timestamp
     });
   } catch (err) {
-    console.error("Error updating scoreType for new matches:", err.message);
-    return res.status(500).json({
-      success: false,
-      message: "Server error while updating new matches",
-      error: err.message,
-    });
+    console.error("Error updating scoreType for new matches:", err);
+    res.status(500).json({ success: false, error: "Server error" });
   }
 };
 
+//update bulk
 // Update scoreType for all sports (bulk)
 const updateAllScoreType = async (req, res) => {
   try {
@@ -222,33 +218,30 @@ const updateAllScoreType = async (req, res) => {
   }
 };
 
-//get all scoretype by sportID
-const getAllScoreTypeBySportID = async (req, res) => {
+//get all setting 
+const getAllSettings = async (req, res) => {
   try {
     const { sportId } = req.body;
+    const settings = await Setting.find({ sportId }).lean();
 
-    if (!sportId) {
+    if (!settings || settings.length == 0) {
       return res.status(400).json({
         success: false,
-        message: "sportId is required in request body",
+        message: "No settings found",
+        data: [],
       });
     }
 
-    // Fetch distinct scoreType values for the given sportId
-    const scoreTypes = await Match.distinct("scoreType", { sportId: Number(sportId) });
-
-    res.json({
+    return res.json({
       success: true,
-      sportId: Number(sportId),
-      scoreTypes,
-      count: scoreTypes.length,
+      total: settings.length,
+      data: settings,
     });
+
   } catch (error) {
-    console.error("Error fetching scoreTypes by sportId:", error.message);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: "Server error while fetching scoreTypes",
-      error: error.message,
+      message: "Internal server error",
     });
   }
 };
@@ -262,5 +255,5 @@ module.exports = {
   deleteAll,
   updateScoreTypeForNewMatches,
   updateAllScoreType,
-  getAllScoreTypeBySportID
+  getAllSettings
 };
