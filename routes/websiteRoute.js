@@ -13,7 +13,7 @@ const {
 router.post('/create', createWebsite);
 
 //get all website
-router.get('/', getAllWebsite);
+router.post('/', getAllWebsite);
 
 //update website
 router.put('/:id', updateWebsiteById);
