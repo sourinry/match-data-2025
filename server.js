@@ -1,24 +1,31 @@
 const express = require('express');
+const authMiddleware = require('./middleware/authMiddleware');
 require('dotenv').config(); 
 const {connectionDB, client} = require('./config/db'); // DB connection function
 const matchJob = require('./jobs/matchJob'); 
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({
-   origin: ['http://localhost:4200', 'http://localhost:8080']
+   origin: ['http://localhost:4200', 'http://localhost:8080'],
+   credentials: true  
 }));
 
 
+//user Routes
+const userRoutes = require('./routes/authRoute');
+app.use('/api/user', userRoutes);
 //match Routes
 const matchRoutes = require('./routes/matchRoute');
-app.use('/api/matches', matchRoutes);
+app.use('/api/matches', authMiddleware,matchRoutes);
 //website whitelisting APIs
 const websiteRoutes = require('./routes/websiteRoute');
-app.use('/api/website', websiteRoutes);
+app.use('/api/website', authMiddleware,websiteRoutes);
 
 
 
